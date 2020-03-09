@@ -37,8 +37,6 @@ struct symbol* expression();
 void consume(string token);
 string peek();
 list<list<string> >::iterator itr;
-struct symbol* printPostorder(struct symbol* node);
-void printTree(struct symbol* root, int space);
 string listfactor();
 struct symbol* listexp();
 struct symbol* listmult();
@@ -54,6 +52,7 @@ string findtype(string str);
 struct dem findDem(string vector);
 int sorvorm=0;
 int numflag=0,vecflag=0;
+
 int main(){
     string line;
     cout<<"Welcome to Universal Complex Scripting Calculator by UCSC, Sri Lanka.\nVersion:  1.0\n";
@@ -71,45 +70,12 @@ int main(){
             }
             if(flag==0)
                 continue;
-
         }
         lexer(line);
     }
     return 0;
 }
 
-void printNestedList(list<list<string> > nested_list) 
-{ 
-    cout << "[\n"; 
-  
-    // nested_list`s iterator(same type as nested_list) 
-    // to iterate the nested_list 
-    list<list<string> >::iterator nested_list_itr; 
-  
-    // Print the nested_list 
-    for (nested_list_itr = nested_list.begin(); 
-         nested_list_itr != nested_list.end(); 
-         ++nested_list_itr) { 
-  
-        cout << "  ["; 
-  
-        // normal_list`s iterator(same type as temp_list) 
-        // to iterate the normal_list 
-        list<string>::iterator single_list_itr; 
-  
-        // pointer of each list one by one in nested list 
-        // as loop goes on 
-        list<string>& single_list_pointer = *nested_list_itr; 
-  
-        for (single_list_itr = single_list_pointer.begin(); 
-             single_list_itr != single_list_pointer.end(); 
-             single_list_itr++) { 
-            cout << " " << *single_list_itr << " "; 
-        } 
-        cout << "]\n"; 
-    } 
-    cout << "]\n"; 
-} 
 
 struct symbol* newNode(string tk,string tkt,struct symbol* left,struct symbol* right)
 { 
@@ -239,29 +205,23 @@ int lexer(string line){
         else{
             cout<<"Token not recognized\n";
             return 0;
-        }
-        
+        }        
     }
     list<string> single_list;
     single_list.push_back("end");
     single_list.push_back("end");
     arr.push_back(single_list);
-    //printNestedList(arr);
     itr=arr.begin();    
-    parser();
-    //printTree(root,0);  
-    //printPostorder(root);  
+    parser(); 
     return 0;
 }
+
 void parser(){    
-    root=expression();
-   
+    root=expression();   
     if(sorvorm==0 && numflag==0){
-        cout<<"ans = "<<evaluateTree(root)<<"\n";
-        
+        cout<<"ans = "<<evaluateTree(root)<<"\n";        
     }
-    else if(sorvorm==1 && vecflag==0){   
-            
+    else if(sorvorm==1 && vecflag==0){             
         string str=evaluateVectorTree(root);
         if(str!=""){
             cout<<"ans =\n   ";
@@ -289,9 +249,9 @@ void parser(){
         }
     }
     numflag=0;
-    vecflag=0;
-    
+    vecflag=0;    
 }
+
 string peek(){        
         list<list<string> >::iterator nested_list_itr=itr;         
         list<string>::iterator single_list_itr;
@@ -302,13 +262,12 @@ string peek(){
 
 void consume(string token){
     if(token!=getnextTokenValue(itr)){
-        cout<<"Invalid Syntax\n";
-         
+        cout<<"Invalid Syntax\n";         
     }
     if(getnextTokenValue(itr)!="end")
-        itr++;
-    
+        itr++;    
 }
+
 string listfactor(){
     string tk=peek();
     if(getnextToken(itr)=="number"){
@@ -322,7 +281,6 @@ string listfactor(){
             cout<<"Unexpected Token\n";
             vecflag=1;
            return ""; 
-
         } 
         consume(tk);
         return tk;
@@ -334,9 +292,7 @@ string listfactor(){
             cout<<"Unexpected Token\n";
             vecflag=1;
            return ""; 
-
-        }
-        
+        }        
         consume(tk);
         return "-"+tk;
     }         
@@ -412,10 +368,10 @@ struct symbol* listexp(){
             }
         }
         x++;
-    }
-    
+    }    
     return exp;
 }
+
 struct symbol* listaddsub(){
     struct symbol* exp=listmult();
     string tk=peek();
@@ -428,8 +384,7 @@ struct symbol* listaddsub(){
     return exp;
 }
 
-struct symbol* listmult(){
-  
+struct symbol* listmult(){  
   struct symbol* exp=listexp();
   string tk=peek();  
   while(tk=="*"||tk==".*"){    
@@ -454,13 +409,11 @@ struct symbol* expression(){
         cout<<"Unexpected Tokens\n";
         numflag=1;
         return NULL;
-    }  
-    
+    }      
     return exp;
 }
 
-struct symbol* term(){
-  
+struct symbol* term(){  
   struct symbol* exp=factor();
   string tk=peek();
   while(tk=="*"||tk==".*"){    
@@ -468,8 +421,7 @@ struct symbol* term(){
       struct symbol* rhs=factor();
       exp=newNode(tk,"operator",exp,rhs);
       tk=peek();
-  }
-  
+  }  
   return exp;
 }
 
@@ -487,7 +439,6 @@ struct symbol* factor(){
             cout<<"Unexpected Token\n";
             numflag=1;
            return NULL; 
-
         }        
         struct symbol* t= newNode(tk,"number",NULL,NULL);
         consume(tk);
@@ -500,7 +451,6 @@ struct symbol* factor(){
             cout<<"Unexpected Token\n";
             numflag=1;
            return NULL; 
-
         }        
         struct symbol* t= newNode("-"+tk,"number",NULL,NULL);
         consume(tk);
@@ -530,8 +480,8 @@ struct symbol* factor(){
         return node;
     }   
     else {
-            numflag=1;
-            vecflag=1;
+           numflag=1;
+           vecflag=1;
            cout<<"Unexpected Token\n";
            return NULL;
         }
@@ -552,25 +502,7 @@ string getnextTokenValue(list<list<string> >::iterator itr){
     single_list_itr=single_list_pointer.begin();
     return *(++single_list_itr);
 }
-struct symbol* printPostorder(struct symbol* node) 
-{ 
-   if (node == NULL) 
-        return NULL; 
-    printPostorder(node->leftsym); 
-    printPostorder(node->rightsym); 
-    cout<<node->tk.type<<" "<<node->tk.value<<"\n";
-    // now deal with the node 
-} 
-void printTree(struct symbol* root, int space){
-   if (root == NULL)
-      return;
-   space += 1;
-   printTree(root->rightsym, space);
-   for (int i = 1; i < space; i++)
-      cout<<"|-----\t";
-   cout<<root->tk.type<<" "<<root->tk.value<<"\n\n";
-   printTree(root->leftsym, space);
-}
+
 double evaluateTree(struct symbol* node){
     if (node == NULL) 
         return 0; 
@@ -585,8 +517,7 @@ double evaluateTree(struct symbol* node){
         return l-r;  
     if (node->tk.value=="*"||node->tk.value==".*")  
         return l*r;
-    return 0;
-   
+    return 0;   
 } 
 
 string evaluateVectorTree(struct symbol* node){
@@ -597,7 +528,6 @@ string evaluateVectorTree(struct symbol* node){
     }
     string l=evaluateVectorTree(node->leftsym); 
     string r=evaluateVectorTree(node->rightsym); 
-    //cout<<node->tk.value<<" "<<l<<" "<<r<<" "<<findtype(l)<<" "<<findtype(r)<<"\n";
     if (node->tk.value=="+" && ((findtype(l)=="vector" && findtype(r)=="number") || (findtype(l)=="number" && findtype(r)=="vector"))) 
             return VectorNumber(l,r,"+");     
     else if (node->tk.value=="+" && findtype(l)=="vector" && findtype(r)=="vector")  
@@ -632,6 +562,7 @@ string evaluateVectorTree(struct symbol* node){
         return MatrixMatrix(l,r,node->tk.value);
     return ""; 
 } 
+
 string VectorNumber(string vector,string num,string op){      
     string result="";
     double number;
@@ -662,11 +593,9 @@ string VectorNumber(string vector,string num,string op){
                         i++; 
                     }
                 }
-                result+=to_string(atof(mid.c_str())+number);
-                
+                result+=to_string(atof(mid.c_str())+number);                
             }
             
-
         }else if(op=="-"){
             int i=0;
             while(i<num.length()){
@@ -692,8 +621,7 @@ string VectorNumber(string vector,string num,string op){
                         i++; 
                     }
                 }
-                result+=to_string(atof(mid.c_str())-number);
-                
+                result+=to_string(atof(mid.c_str())-number);                
             }
 
         }else if(op=="*"||op==".*"){
@@ -721,10 +649,8 @@ string VectorNumber(string vector,string num,string op){
                         i++; 
                     }
                 }
-                result+=to_string(atof(mid.c_str())*number);
-                
+                result+=to_string(atof(mid.c_str())*number);                
             }
-
         }
     }else{
         number=atof(num.c_str());
@@ -753,10 +679,8 @@ string VectorNumber(string vector,string num,string op){
                         i++; 
                     }
                 }
-                result+=to_string(atof(mid.c_str())+number);
-                
+                result+=to_string(atof(mid.c_str())+number);                
             }
-
         }else if(op=="-"){
             int i=0;
             while(i<vector.length()){
@@ -782,8 +706,7 @@ string VectorNumber(string vector,string num,string op){
                         i++; 
                     }
                 }
-                result+=to_string(atof(mid.c_str())-number);
-                
+                result+=to_string(atof(mid.c_str())-number);                
             }
 
         }else if(op=="*"||op==".*"){
@@ -811,27 +734,18 @@ string VectorNumber(string vector,string num,string op){
                         i++; 
                     }
                 }
-                result+=to_string(atof(mid.c_str())*number);
-                
+                result+=to_string(atof(mid.c_str())*number);                
             }
-
         }
     }
     result+="";
-    return result;
-    
+    return result;    
 }
 
-string VectorVector(string vector1,string vector2,string op){
-    
+string VectorVector(string vector1,string vector2,string op){    
             
     struct dem d1=findDem(vector1);
     struct dem d2=findDem(vector2);
-    //cout<<d1.x<<d1.y<<" "<<d2.x<<d2.y<<"\n";
-    /* if(((d1.x!=1 && d1.y!=1) || (d2.x!=1 && d2.y!=1)) && (d1.x!=d2.x || d1.y!=d2.y)){        
-        cout<<"Demensions Mismatch";
-        exit(0); 
-    } */
     int i=0;
     string result="";
     if(op=="+"){        
@@ -857,8 +771,7 @@ string VectorVector(string vector1,string vector2,string op){
                         mid1+=vector1[i];
                         i++; 
                     }
-                }
-                
+                }                
             }
             i=0;
             string mid2="";
@@ -884,8 +797,7 @@ string VectorVector(string vector1,string vector2,string op){
                         i++; 
                     }
                 }                
-                result+=to_string(atof(mid1.c_str())+atof(mid2.c_str()));
-                
+                result+=to_string(atof(mid1.c_str())+atof(mid2.c_str()));                
             }
             return result;
 
@@ -911,8 +823,7 @@ string VectorVector(string vector1,string vector2,string op){
                         mid1+=vector1[i];
                         i++; 
                     }
-                }
-                
+                }                
             }
             i=0;
             
@@ -939,10 +850,8 @@ string VectorVector(string vector1,string vector2,string op){
                         i++; 
                     }
                 }
-                 result+=to_string(atof(mid1.c_str())+atof(mid2.c_str()));
-                
-            }
-           
+                 result+=to_string(atof(mid1.c_str())+atof(mid2.c_str()));                
+            }           
             return result;
         }
         else if(d2.x==1 && d2.y==1){
@@ -966,8 +875,7 @@ string VectorVector(string vector1,string vector2,string op){
                         mid1+=vector2[i];
                         i++; 
                     }
-                }
-                
+                }                
             }
             i=0;
             
@@ -994,19 +902,15 @@ string VectorVector(string vector1,string vector2,string op){
                         i++; 
                     }
                 }
-                 result+=to_string(atof(mid2.c_str())+atof(mid1.c_str()));
-                
-            }
-           
-            return result;
-            
+                 result+=to_string(atof(mid2.c_str())+atof(mid1.c_str()));                
+            }           
+            return result;            
         }
         else{
             if(d1.x!=d2.x || d1.y!=d2.y){        
                 cout<<"Demensions Mismatch\n";
                 return "";
-            }
-            
+            }            
             int j=0;
             while(i<vector1.length() || j<vector2.length()){
                 string mid1="";
@@ -1700,10 +1604,10 @@ string MatrixNumber(string matrix,string num,string op){
     return result;
     
 }
+
 string MatrixVector(string matrix,string vector,string op){
     struct dem d1=findDem(matrix);
     struct dem d2=findDem(vector);
-    //cout<<d1.x<<d1.y<<" "<<d2.x<<d2.y<<"\n";
     string result="";
     int i=0;
     if(d1.x==1 && d1.y==1){
@@ -2038,14 +1942,13 @@ string MatrixVector(string matrix,string vector,string op){
     else{        
         cout<<"Demensions Mismatch\n";
         return "";
-        //exit(0); 
     }
     return "";
 }
+
 string MatrixMatrix(string matrix1,string matrix2,string op){
     struct dem d1=findDem(matrix1);
     struct dem d2=findDem(matrix2);
-    //cout<<d1.x<<d1.y<<" "<<d2.x<<d2.y<<"\n";  
     string result="";
     int i=0;
     int j=0;  
@@ -2053,7 +1956,6 @@ string MatrixMatrix(string matrix1,string matrix2,string op){
         if(d1.y!=d2.y){
             cout<<"Demensions Mismatch\n";
             return "";
-            //exit(0); 
         }
         return MatrixMult(matrix1,d1.x,d1.y,matrix2);
     }
@@ -2061,7 +1963,6 @@ string MatrixMatrix(string matrix1,string matrix2,string op){
         if(d1.x!=d2.x || d1.y!=d2.y){
             cout<<"Demensions Mismatch\n";
             return "";
-            //exit(0); 
         }
          int j=0;
             while(i<matrix1.length() || j<matrix2.length()){
@@ -2118,7 +2019,6 @@ string MatrixMatrix(string matrix1,string matrix2,string op){
         if(d1.x!=d2.x || d1.y!=d2.y){
             cout<<"Demensions Mismatch\n";
             return "";
-            //exit(0); 
         }
         if(op=="+"){
             while(i<matrix1.length() || j<matrix2.length()){
@@ -2320,6 +2220,7 @@ string MatrixMult(string matrix1,int x,int y,string matrix2){
     return matrix+"]";  
 
 }
+
 string findtype(string str){
     
     int i=0;
@@ -2340,6 +2241,7 @@ string findtype(string str){
         
         
 } 
+
 struct dem findDem(string vector){
     int i=0;
     struct dem d;
