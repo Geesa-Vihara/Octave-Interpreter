@@ -94,7 +94,7 @@ int lexer(string line){
     int flag=0;
     while(i<str.length()){
         
-        if(isspace(str[i])&&flag==0){
+        if(isspace(str[i]) && flag==0){
             i++;
         }
         else if(isspace(str[i]) && flag==1){
@@ -103,7 +103,7 @@ int lexer(string line){
             list<string> back=arr.back();
             list<std::string>::iterator it = back.begin();
             advance(it,1);
-            if(*it!=";" && *it!="["){
+            if(*it!=";" && *it!="[" && *it!=","){
                 single_list.push_back("space");
                 single_list.push_back(" ");  
                 arr.push_back(single_list);
@@ -113,7 +113,8 @@ int lexer(string line){
                 i++;
             } 
         }
-        else if(str[i]=='+'||str[i]=='-'||str[i]=='*'||str[i]=='('||str[i]==')'||str[i]=='['||str[i]==']'||str[i]==','||str[i]==';'||(i+1<str.length() &&(str[i]=='.' && str[i+1]=='*'))){
+        else if(str[i]=='+'||str[i]=='-'||str[i]=='*'||str[i]=='('||str[i]==')'||str[i]=='['||str[i]==']'
+                ||str[i]==','||str[i]==';'||(i+1<str.length() &&(str[i]=='.' && str[i+1]=='*'))){
             list<string> single_list;            
             
             if(str[i]=='+'){
@@ -132,7 +133,7 @@ int lexer(string line){
                i++;
             } 
              else if(str[i]=='('){
-                 single_list.push_back("lparenthisis");
+               single_list.push_back("lparenthisis");
                single_list.push_back("("); 
                i++;
             } 
@@ -148,7 +149,7 @@ int lexer(string line){
                i++;
             } 
              else if(str[i]==']'){
-               flag=0;
+                flag=0;
                 list<string> back=arr.back();
                 list<std::string>::iterator it = back.begin();
                 if(*it=="space"){
@@ -159,6 +160,11 @@ int lexer(string line){
                i++;
             } 
             else if(str[i]==','){
+               list<string> back=arr.back();
+               list<std::string>::iterator it = back.begin();
+               if(*it=="space"){
+                   arr.pop_back();
+               }
                single_list.push_back("operator");
                single_list.push_back(","); 
                i++;
@@ -1953,7 +1959,7 @@ string MatrixMatrix(string matrix1,string matrix2,string op){
     int i=0;
     int j=0;  
     if(op=="*"){
-        if(d1.y!=d2.y){
+        if(d1.y!=d2.x){
             cout<<"Demensions Mismatch\n";
             return "";
         }
